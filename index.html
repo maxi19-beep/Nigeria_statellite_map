@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nigeria Satellite Map (High Zoom)</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #map {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Floating Info Box styling */
+        .info-card {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            pointer-events: none;
+            max-width: 300px;
+        }
+
+        .info-card h2 {
+            font-size: 15px;
+            margin-bottom: 4px;
+            color: #00ffcc;
+        }
+
+        .info-card p {
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        /* Custom Popup Text styling */
+        .leaflet-popup-content-wrapper {
+            background: #111;
+            color: #fff;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .leaflet-popup-tip {
+            background: #111;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="info-card">
+        <h2>🇳🇬 Nigeria Satellite View</h2>
+        <p>Zoom in close to view streets, structures, and land features. Map bounds are locked to Nigeria.</p>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // 1. Define strict geographic boundaries for Nigeria to keep the user inside the country
+        const nigeriaBounds = L.latLngBounds(
+            [2.68, 2.69],   // Southwest corner (South/West border approx)
+            [13.89, 14.68]  // Northeast corner (North/East border approx)
+        );
+
+        // 2. Initialize Map centered over Nigeria
+        const map = L.map('map', {
+            center: [9.0820, 8.6753], // Center of Nigeria (Abuja area)
+            zoom: 6,
+            minZoom: 6,              // Prevents zooming out past country view
+            maxZoom: 19,             // High detail zoom level to see structures clearly
+            maxBounds: nigeriaBounds, // Locks panning strictly to Nigeria
+            maxBoundsViscosity: 1.0  // Solid wall so user cannot drag outside Nigeria
+        });
+
+        // 3. Add High-Resolution Satellite Imagery Layer (ESRI World Imagery)
+        // This provides pre-snapped, crystal-clear high zoom imagery of terrain, buildings, and trees
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-GP, and the GIS User Community',
+            maxZoom: 19,
+            maxNativeZoom: 19
+        }).addTo(map);
+
+        // 4. Optional: Add a few sample landmark spots within Nigeria
+        const landmarks = [
+            { name: "Aso Rock, Abuja ⛰️", coords: [9.0579, 7.5458], desc: "Monolith landmark in Abuja." },
+            { name: "Eko Atlantic, Lagos 🏙️", coords: [6.4281, 3.4219], desc: "Coastal city development project." },
+            { name: "Zuma Rock, Niger State 🗿", coords: [9.1283, 7.2369], desc: "Large natural monolith." }
+        ];
+
+        landmarks.forEach(place => {
+            const marker = L.marker(place.coords).addTo(map);
+            marker.bindPopup(`<b>${place.name}</b><br>${place.desc}`);
+        });
+    </script>
+</body>
+</html>
